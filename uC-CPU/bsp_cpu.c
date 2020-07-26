@@ -35,7 +35,7 @@
 
 #define    BSP_CPU_MODULE
 #include  <cpu_core.h>
-#include  "stm32f4xx.h"
+#include "stm32f4xx.h"
 
 
 /*
@@ -137,7 +137,6 @@
 #if (CPU_CFG_TS_TMR_EN == DEF_ENABLED)
 void  CPU_TS_TmrInit (void)
 {
-
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
     TIM_TimeBaseInitTypeDef Init_TIM1;
 
@@ -150,7 +149,6 @@ void  CPU_TS_TmrInit (void)
     TIM_TimeBaseInit(TIM1, &Init_TIM1);
 
     TIM_Cmd(TIM1, ENABLE);
-
 }
 #endif
 
@@ -232,6 +230,7 @@ void  CPU_TS_TmrInit (void)
 CPU_TS_TMR  CPU_TS_TmrRd (void)
 {
     CPU_TS_TMR  ts_tmr_cnts;
+
 
     ts_tmr_cnts = TIM1->CNT;
 

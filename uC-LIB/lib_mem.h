@@ -1,24 +1,16 @@
 /*
 *********************************************************************************************************
-*                                                uC/LIB
-*                                        CUSTOM LIBRARY MODULES
+*                                               uC/LIB
+*                                       Custom Library Modules
 *
-*                         (c) Copyright 2004-2014; Micrium, Inc.; Weston, FL
+*                    Copyright 2004-2020 Silicon Laboratories Inc. www.silabs.com
 *
-*                  All rights reserved.  Protected by international copyright laws.
+*                                 SPDX-License-Identifier: APACHE-2.0
 *
-*                  uC/LIB is provided in source form to registered licensees ONLY.  It is
-*                  illegal to distribute this source code to any third party unless you receive
-*                  written permission by an authorized Micrium representative.  Knowledge of
-*                  the source code may NOT be used to develop a similar product.
+*               This software is subject to an open source license and is distributed by
+*                Silicon Laboratories Inc. pursuant to the terms of the Apache License,
+*                    Version 2.0 available at www.apache.org/licenses/LICENSE-2.0.
 *
-*                  Please help us continue to provide the Embedded community with the finest
-*                  software available.  Your honesty is greatly appreciated.
-*
-*                  You can find our product's user manual, API reference, release notes and
-*                  more information at: https://doc.micrium.com
-*
-*                  You can contact us at: http://www.micrium.com
 *********************************************************************************************************
 */
 
@@ -27,35 +19,30 @@
 *
 *                                     STANDARD MEMORY OPERATIONS
 *
-* Filename      : lib_mem.h
-* Version       : V1.38.01
-* Programmer(s) : ITJ
-*                 FBJ
-*                 EJ
-*                 JFD
+* Filename : lib_mem.h
+* Version  : V1.39.00
 *********************************************************************************************************
-* Note(s)       : (1) NO compiler-supplied standard library functions are used in library or product software.
+* Note(s)  : (1) NO compiler-supplied standard library functions are used in library or product software.
 *
-*                     (a) ALL standard library functions are implemented in the custom library modules :
+*                (a) ALL standard library functions are implemented in the custom library modules :
 *
-*                         (1) \<Custom Library Directory>\lib_*.*
+*                    (1) \<Custom Library Directory>\lib_*.*
 *
-*                         (2) \<Custom Library Directory>\Ports\<cpu>\<compiler>\lib*_a.*
+*                    (2) \<Custom Library Directory>\Ports\<cpu>\<compiler>\lib*_a.*
 *
-*                               where
-*                                       <Custom Library Directory>      directory path for custom library software
-*                                       <cpu>                           directory name for specific processor (CPU)
-*                                       <compiler>                      directory name for specific compiler
+*                          where
+*                                  <Custom Library Directory>      directory path for custom library software
+*                                  <cpu>                           directory name for specific processor (CPU)
+*                                  <compiler>                      directory name for specific compiler
 *
-*                     (b) Product-specific library functions are implemented in individual products.
+*                (b) Product-specific library functions are implemented in individual products.
 *
-*                 (2) Assumes the following versions (or more recent) of software modules are included in
-*                     the project build :
+*            (2) Assumes the following versions (or more recent) of software modules are included in
+*                the project build :
 *
-*                     (a) uC/CPU V1.27
+*                (a) uC/CPU V1.27
 *********************************************************************************************************
 */
-
 
 /*
 *********************************************************************************************************
@@ -289,11 +276,11 @@ struct mem_seg {
 };
 
 typedef  struct  mem_seg_info {                                 /* --------------------- SEG INFO --------------------- */
-    CPU_SIZE_T  UsedSize;                                       /* Allocated seg octets.                                */
+    CPU_SIZE_T  UsedSize;                                       /* Used size, independently of alignment.               */
     CPU_SIZE_T  TotalSize;                                      /* Total seg capacity, in octets.                       */
 
     CPU_ADDR    AddrBase;
-    CPU_ADDR    AddrNextAlloc;
+    CPU_ADDR    AddrNextAlloc;                                  /* Next aligned address, 0 if none available.           */
 } MEM_SEG_INFO;
 
 
@@ -575,6 +562,10 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #define  MEM_VAL_GET_INT16U_BIG(addr)           ((CPU_INT16U)(((CPU_INT16U)(((CPU_INT16U)(*(((CPU_INT08U *)(addr)) + 0))) << (1u * DEF_OCTET_NBR_BITS))) + \
                                                               ((CPU_INT16U)(((CPU_INT16U)(*(((CPU_INT08U *)(addr)) + 1))) << (0u * DEF_OCTET_NBR_BITS)))))
 
+#define  MEM_VAL_GET_INT24U_BIG(addr)           ((CPU_INT32U)(((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 0))) << (2u * DEF_OCTET_NBR_BITS))) + \
+                                                              ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 1))) << (1u * DEF_OCTET_NBR_BITS))) + \
+                                                              ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 2))) << (0u * DEF_OCTET_NBR_BITS)))))
+
 #define  MEM_VAL_GET_INT32U_BIG(addr)           ((CPU_INT32U)(((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 0))) << (3u * DEF_OCTET_NBR_BITS))) + \
                                                               ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 1))) << (2u * DEF_OCTET_NBR_BITS))) + \
                                                               ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 2))) << (1u * DEF_OCTET_NBR_BITS))) + \
@@ -587,6 +578,10 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #define  MEM_VAL_GET_INT16U_LITTLE(addr)        ((CPU_INT16U)(((CPU_INT16U)(((CPU_INT16U)(*(((CPU_INT08U *)(addr)) + 0))) << (0u * DEF_OCTET_NBR_BITS))) + \
                                                               ((CPU_INT16U)(((CPU_INT16U)(*(((CPU_INT08U *)(addr)) + 1))) << (1u * DEF_OCTET_NBR_BITS)))))
 
+#define  MEM_VAL_GET_INT24U_LITTLE(addr)        ((CPU_INT32U)(((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 0))) << (0u * DEF_OCTET_NBR_BITS))) + \
+                                                              ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 1))) << (1u * DEF_OCTET_NBR_BITS))) + \
+                                                              ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 2))) << (2u * DEF_OCTET_NBR_BITS)))))
+
 #define  MEM_VAL_GET_INT32U_LITTLE(addr)        ((CPU_INT32U)(((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 0))) << (0u * DEF_OCTET_NBR_BITS))) + \
                                                               ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 1))) << (1u * DEF_OCTET_NBR_BITS))) + \
                                                               ((CPU_INT32U)(((CPU_INT32U)(*(((CPU_INT08U *)(addr)) + 2))) << (2u * DEF_OCTET_NBR_BITS))) + \
@@ -598,12 +593,14 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 
 #define  MEM_VAL_GET_INT08U(addr)                               MEM_VAL_GET_INT08U_BIG(addr)
 #define  MEM_VAL_GET_INT16U(addr)                               MEM_VAL_GET_INT16U_BIG(addr)
+#define  MEM_VAL_GET_INT24U(addr)                               MEM_VAL_GET_INT24U_BIG(addr)
 #define  MEM_VAL_GET_INT32U(addr)                               MEM_VAL_GET_INT32U_BIG(addr)
 
 #elif   (CPU_CFG_ENDIAN_TYPE == CPU_ENDIAN_TYPE_LITTLE)
 
 #define  MEM_VAL_GET_INT08U(addr)                               MEM_VAL_GET_INT08U_LITTLE(addr)
 #define  MEM_VAL_GET_INT16U(addr)                               MEM_VAL_GET_INT16U_LITTLE(addr)
+#define  MEM_VAL_GET_INT24U(addr)                               MEM_VAL_GET_INT24U_LITTLE(addr)
 #define  MEM_VAL_GET_INT32U(addr)                               MEM_VAL_GET_INT32U_LITTLE(addr)
 
 #else                                                           /* See Note #6.                                         */
@@ -671,6 +668,10 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #define  MEM_VAL_SET_INT16U_BIG(addr, val)                     do { (*(((CPU_INT08U *)(addr)) + 0)) = ((CPU_INT08U)((((CPU_INT16U)(val)) & (CPU_INT16U)    0xFF00u) >> (1u * DEF_OCTET_NBR_BITS))); \
                                                                     (*(((CPU_INT08U *)(addr)) + 1)) = ((CPU_INT08U)((((CPU_INT16U)(val)) & (CPU_INT16U)    0x00FFu) >> (0u * DEF_OCTET_NBR_BITS))); } while (0)
 
+#define  MEM_VAL_SET_INT24U_BIG(addr, val)                     do { (*(((CPU_INT08U *)(addr)) + 0)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)  0xFF0000u) >> (2u * DEF_OCTET_NBR_BITS))); \
+                                                                    (*(((CPU_INT08U *)(addr)) + 1)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)  0x00FF00u) >> (1u * DEF_OCTET_NBR_BITS))); \
+                                                                    (*(((CPU_INT08U *)(addr)) + 2)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)  0x0000FFu) >> (0u * DEF_OCTET_NBR_BITS))); } while (0)
+
 #define  MEM_VAL_SET_INT32U_BIG(addr, val)                     do { (*(((CPU_INT08U *)(addr)) + 0)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)0xFF000000u) >> (3u * DEF_OCTET_NBR_BITS))); \
                                                                     (*(((CPU_INT08U *)(addr)) + 1)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)0x00FF0000u) >> (2u * DEF_OCTET_NBR_BITS))); \
                                                                     (*(((CPU_INT08U *)(addr)) + 2)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)0x0000FF00u) >> (1u * DEF_OCTET_NBR_BITS))); \
@@ -683,6 +684,10 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #define  MEM_VAL_SET_INT16U_LITTLE(addr, val)                  do { (*(((CPU_INT08U *)(addr)) + 0)) = ((CPU_INT08U)((((CPU_INT16U)(val)) & (CPU_INT16U)    0x00FFu) >> (0u * DEF_OCTET_NBR_BITS))); \
                                                                     (*(((CPU_INT08U *)(addr)) + 1)) = ((CPU_INT08U)((((CPU_INT16U)(val)) & (CPU_INT16U)    0xFF00u) >> (1u * DEF_OCTET_NBR_BITS))); } while (0)
 
+#define  MEM_VAL_SET_INT24U_LITTLE(addr, val)                  do { (*(((CPU_INT08U *)(addr)) + 0)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)  0x0000FFu) >> (0u * DEF_OCTET_NBR_BITS))); \
+                                                                    (*(((CPU_INT08U *)(addr)) + 1)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)  0x00FF00u) >> (1u * DEF_OCTET_NBR_BITS))); \
+                                                                    (*(((CPU_INT08U *)(addr)) + 2)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)  0xFF0000u) >> (2u * DEF_OCTET_NBR_BITS))); } while (0)
+
 #define  MEM_VAL_SET_INT32U_LITTLE(addr, val)                  do { (*(((CPU_INT08U *)(addr)) + 0)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)0x000000FFu) >> (0u * DEF_OCTET_NBR_BITS))); \
                                                                     (*(((CPU_INT08U *)(addr)) + 1)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)0x0000FF00u) >> (1u * DEF_OCTET_NBR_BITS))); \
                                                                     (*(((CPU_INT08U *)(addr)) + 2)) = ((CPU_INT08U)((((CPU_INT32U)(val)) & (CPU_INT32U)0x00FF0000u) >> (2u * DEF_OCTET_NBR_BITS))); \
@@ -692,15 +697,17 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 
 #if     (CPU_CFG_ENDIAN_TYPE == CPU_ENDIAN_TYPE_BIG)
 
-#define  MEM_VAL_SET_INT08U(addr, val)                          MEM_VAL_SET_INT08U_BIG(addr, val)
-#define  MEM_VAL_SET_INT16U(addr, val)                          MEM_VAL_SET_INT16U_BIG(addr, val)
-#define  MEM_VAL_SET_INT32U(addr, val)                          MEM_VAL_SET_INT32U_BIG(addr, val)
+#define  MEM_VAL_SET_INT08U(addr, val)                          MEM_VAL_SET_INT08U_BIG((addr), (val))
+#define  MEM_VAL_SET_INT16U(addr, val)                          MEM_VAL_SET_INT16U_BIG((addr), (val))
+#define  MEM_VAL_SET_INT24U(addr, val)                          MEM_VAL_SET_INT24U_BIG((addr), (val))
+#define  MEM_VAL_SET_INT32U(addr, val)                          MEM_VAL_SET_INT32U_BIG((addr), (val))
 
 #elif   (CPU_CFG_ENDIAN_TYPE == CPU_ENDIAN_TYPE_LITTLE)
 
-#define  MEM_VAL_SET_INT08U(addr, val)                          MEM_VAL_SET_INT08U_LITTLE(addr, val)
-#define  MEM_VAL_SET_INT16U(addr, val)                          MEM_VAL_SET_INT16U_LITTLE(addr, val)
-#define  MEM_VAL_SET_INT32U(addr, val)                          MEM_VAL_SET_INT32U_LITTLE(addr, val)
+#define  MEM_VAL_SET_INT08U(addr, val)                          MEM_VAL_SET_INT08U_LITTLE((addr), (val))
+#define  MEM_VAL_SET_INT16U(addr, val)                          MEM_VAL_SET_INT16U_LITTLE((addr), (val))
+#define  MEM_VAL_SET_INT24U(addr, val)                          MEM_VAL_SET_INT24U_LITTLE((addr), (val))
+#define  MEM_VAL_SET_INT32U(addr, val)                          MEM_VAL_SET_INT32U_LITTLE((addr), (val))
 
 #else                                                           /* See Note #6.                                         */
 
@@ -780,6 +787,10 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #define  MEM_VAL_COPY_GET_INT16U_BIG(addr_dest, addr_src)      do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); } while (0)
 
+#define  MEM_VAL_COPY_GET_INT24U_BIG(addr_dest, addr_src)      do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 2)); } while (0)
+
 #define  MEM_VAL_COPY_GET_INT32U_BIG(addr_dest, addr_src)      do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 2)); \
@@ -792,18 +803,20 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #define  MEM_VAL_COPY_GET_INT16U_LITTLE(addr_dest, addr_src)   do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 0)); } while (0)
 
+#define  MEM_VAL_COPY_GET_INT24U_LITTLE(addr_dest, addr_src)   do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 2)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 0)); } while (0)
+
 #define  MEM_VAL_COPY_GET_INT32U_LITTLE(addr_dest, addr_src)   do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 3)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 2)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 3)) = (*(((CPU_INT08U *)(addr_src)) + 0)); } while (0)
 
 
-
-#define  MEM_VAL_COPY_GET_INT08U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT08U_BIG(addr_dest, addr_src)
-#define  MEM_VAL_COPY_GET_INT16U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT16U_BIG(addr_dest, addr_src)
-#define  MEM_VAL_COPY_GET_INT32U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT32U_BIG(addr_dest, addr_src)
-
-
+#define  MEM_VAL_COPY_GET_INT08U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT08U_BIG((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_GET_INT16U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT16U_BIG((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_GET_INT24U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT24U_BIG((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_GET_INT32U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT32U_BIG((addr_dest), (addr_src))
 
 
 #elif   (CPU_CFG_ENDIAN_TYPE == CPU_ENDIAN_TYPE_LITTLE)
@@ -813,6 +826,10 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 
 #define  MEM_VAL_COPY_GET_INT16U_BIG(addr_dest, addr_src)      do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 0)); } while (0)
+
+#define  MEM_VAL_COPY_GET_INT24U_BIG(addr_dest, addr_src)      do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 2)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 0)); } while (0)
 
 #define  MEM_VAL_COPY_GET_INT32U_BIG(addr_dest, addr_src)      do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 3)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 2)); \
@@ -826,18 +843,20 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #define  MEM_VAL_COPY_GET_INT16U_LITTLE(addr_dest, addr_src)   do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); } while (0)
 
+#define  MEM_VAL_COPY_GET_INT24U_LITTLE(addr_dest, addr_src)   do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 2)); } while (0)
+
 #define  MEM_VAL_COPY_GET_INT32U_LITTLE(addr_dest, addr_src)   do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 2)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 3)) = (*(((CPU_INT08U *)(addr_src)) + 3)); } while (0)
 
 
-
-#define  MEM_VAL_COPY_GET_INT08U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT08U_LITTLE(addr_dest, addr_src)
-#define  MEM_VAL_COPY_GET_INT16U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT16U_LITTLE(addr_dest, addr_src)
-#define  MEM_VAL_COPY_GET_INT32U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT32U_LITTLE(addr_dest, addr_src)
-
-
+#define  MEM_VAL_COPY_GET_INT08U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT08U_LITTLE((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_GET_INT16U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT16U_LITTLE((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_GET_INT24U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT24U_LITTLE((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_GET_INT32U(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT32U_LITTLE((addr_dest), (addr_src))
 
 
 #else                                                           /* See Note #7.                                         */
@@ -846,6 +865,7 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 #error  "                     [See 'cpu.h  CONFIGURATION ERRORS']"
 
 #endif
+
 
 
 /*
@@ -946,7 +966,7 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
                                                                         } while (0)
 
 
-#define  MEM_VAL_COPY_GET_INTU(addr_dest, addr_src, val_size)           MEM_VAL_COPY_GET_INTU_BIG(addr_dest, addr_src, val_size)
+#define  MEM_VAL_COPY_GET_INTU(addr_dest, addr_src, val_size)           MEM_VAL_COPY_GET_INTU_BIG((addr_dest), (addr_src), (val_size))
 
 
 
@@ -977,7 +997,7 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
                                                                         } while (0)
 
 
-#define  MEM_VAL_COPY_GET_INTU(addr_dest, addr_src, val_size)           MEM_VAL_COPY_GET_INTU_LITTLE(addr_dest, addr_src, val_size)
+#define  MEM_VAL_COPY_GET_INTU(addr_dest, addr_src, val_size)           MEM_VAL_COPY_GET_INTU_LITTLE((addr_dest), (addr_src), (val_size))
 
 
 
@@ -1047,18 +1067,21 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 */
 
                                                                 /* See Note #5.                                         */
-#define  MEM_VAL_COPY_SET_INT08U_BIG(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT08U_BIG(addr_dest, addr_src)
-#define  MEM_VAL_COPY_SET_INT16U_BIG(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT16U_BIG(addr_dest, addr_src)
-#define  MEM_VAL_COPY_SET_INT32U_BIG(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT32U_BIG(addr_dest, addr_src)
+#define  MEM_VAL_COPY_SET_INT08U_BIG(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT08U_BIG((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT16U_BIG(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT16U_BIG((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT24U_BIG(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT24U_BIG((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT32U_BIG(addr_dest, addr_src)               MEM_VAL_COPY_GET_INT32U_BIG((addr_dest), (addr_src))
 
-#define  MEM_VAL_COPY_SET_INT08U_LITTLE(addr_dest, addr_src)            MEM_VAL_COPY_GET_INT08U_LITTLE(addr_dest, addr_src)
-#define  MEM_VAL_COPY_SET_INT16U_LITTLE(addr_dest, addr_src)            MEM_VAL_COPY_GET_INT16U_LITTLE(addr_dest, addr_src)
-#define  MEM_VAL_COPY_SET_INT32U_LITTLE(addr_dest, addr_src)            MEM_VAL_COPY_GET_INT32U_LITTLE(addr_dest, addr_src)
+#define  MEM_VAL_COPY_SET_INT08U_LITTLE(addr_dest, addr_src)            MEM_VAL_COPY_GET_INT08U_LITTLE((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT16U_LITTLE(addr_dest, addr_src)            MEM_VAL_COPY_GET_INT16U_LITTLE((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT24U_LITTLE(addr_dest, addr_src)            MEM_VAL_COPY_GET_INT24U_LITTLE((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT32U_LITTLE(addr_dest, addr_src)            MEM_VAL_COPY_GET_INT32U_LITTLE((addr_dest), (addr_src))
 
 
-#define  MEM_VAL_COPY_SET_INT08U(addr_dest, addr_src)                   MEM_VAL_COPY_GET_INT08U(addr_dest, addr_src)
-#define  MEM_VAL_COPY_SET_INT16U(addr_dest, addr_src)                   MEM_VAL_COPY_GET_INT16U(addr_dest, addr_src)
-#define  MEM_VAL_COPY_SET_INT32U(addr_dest, addr_src)                   MEM_VAL_COPY_GET_INT32U(addr_dest, addr_src)
+#define  MEM_VAL_COPY_SET_INT08U(addr_dest, addr_src)                   MEM_VAL_COPY_GET_INT08U((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT16U(addr_dest, addr_src)                   MEM_VAL_COPY_GET_INT16U((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT24U(addr_dest, addr_src)                   MEM_VAL_COPY_GET_INT24U((addr_dest), (addr_src))
+#define  MEM_VAL_COPY_SET_INT32U(addr_dest, addr_src)                   MEM_VAL_COPY_GET_INT32U((addr_dest), (addr_src))
 
 
 /*
@@ -1121,9 +1144,9 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 */
 
                                                                 /* See Note #5.                                         */
-#define  MEM_VAL_COPY_SET_INTU_BIG(addr_dest, addr_src, val_size)       MEM_VAL_COPY_GET_INTU_BIG(addr_dest, addr_src, val_size)
-#define  MEM_VAL_COPY_SET_INTU_LITTLE(addr_dest, addr_src, val_size)    MEM_VAL_COPY_GET_INTU_LITTLE(addr_dest, addr_src, val_size)
-#define  MEM_VAL_COPY_SET_INTU(addr_dest, addr_src, val_size)           MEM_VAL_COPY_GET_INTU(addr_dest, addr_src, val_size)
+#define  MEM_VAL_COPY_SET_INTU_BIG(addr_dest, addr_src, val_size)       MEM_VAL_COPY_GET_INTU_BIG((addr_dest), (addr_src), (val_size))
+#define  MEM_VAL_COPY_SET_INTU_LITTLE(addr_dest, addr_src, val_size)    MEM_VAL_COPY_GET_INTU_LITTLE((addr_dest), (addr_src), (val_size))
+#define  MEM_VAL_COPY_SET_INTU(addr_dest, addr_src, val_size)           MEM_VAL_COPY_GET_INTU((addr_dest), (addr_src), (val_size))
 
 
 /*
@@ -1178,6 +1201,10 @@ typedef  struct  mem_dyn_pool {                                 /* -------------
 
 #define  MEM_VAL_COPY_16(addr_dest, addr_src)                  do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); } while (0)
+
+#define  MEM_VAL_COPY_24(addr_dest, addr_src)                  do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
+                                                                    (*(((CPU_INT08U *)(addr_dest)) + 2)) = (*(((CPU_INT08U *)(addr_src)) + 2)); } while (0)
 
 #define  MEM_VAL_COPY_32(addr_dest, addr_src)                  do { (*(((CPU_INT08U *)(addr_dest)) + 0)) = (*(((CPU_INT08U *)(addr_src)) + 0)); \
                                                                     (*(((CPU_INT08U *)(addr_dest)) + 1)) = (*(((CPU_INT08U *)(addr_src)) + 1)); \
@@ -1409,4 +1436,3 @@ CPU_SIZE_T         Mem_DynPoolBlkNbrAvailGet(       MEM_DYN_POOL      *p_pool,
 */
 
 #endif                                                          /* End of lib mem module include.                       */
-

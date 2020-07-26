@@ -1,20 +1,15 @@
 ;********************************************************************************************************
-;                                                uC/LIB
-;                                        CUSTOM LIBRARY MODULES
+;                                               uC/LIB
+;                                       Custom Library Modules
 ;
-;                          (c) Copyright 2004-2011; Micrium, Inc.; Weston, FL
+;                    Copyright 2004-2020 Silicon Laboratories Inc. www.silabs.com
 ;
-;               All rights reserved.  Protected by international copyright laws.
+;                                 SPDX-License-Identifier: APACHE-2.0
 ;
-;               uC/LIB is provided in source form to registered licensees ONLY.  It is
-;               illegal to distribute this source code to any third party unless you receive
-;               written permission by an authorized Micrium representative.  Knowledge of
-;               the source code may NOT be used to develop a similar product.
+;               This software is subject to an open source license and is distributed by
+;                Silicon Laboratories Inc. pursuant to the terms of the Apache License,
+;                    Version 2.0 available at www.apache.org/licenses/LICENSE-2.0.
 ;
-;               Please help us continue to provide the Embedded community with the finest
-;               software available.  Your honesty is greatly appreciated.
-;
-;               You can contact us at www.micrium.com.
 ;********************************************************************************************************
 
 
@@ -28,27 +23,25 @@
 ;                                      ARM Developer Suite (ADS)
 ;                                           Keil uVision
 ;
-; Filename      : lib_mem_a.asm
-; Version       : V1.38.01.00
-; Programmer(s) : JDH
-;                 BAN
+; Filename : lib_mem_a.asm
+; Version  : V1.39.00
 ;********************************************************************************************************
-; Note(s)       : (1) NO compiler-supplied standard library functions are used in library or product software.
+; Note(s)  : (1) NO compiler-supplied standard library functions are used in library or product software.
 ;
-;                     (a) ALL standard library functions are implemented in the custom library modules :
+;                (a) ALL standard library functions are implemented in the custom library modules :
 ;
-;                         (1) \<Custom Library Directory>\lib*.*
+;                    (1) \<Custom Library Directory>\lib*.*
 ;
-;                         (2) \<Custom Library Directory>\Ports\<cpu>\<compiler>\lib*_a.*
+;                    (2) \<Custom Library Directory>\Ports\<cpu>\<compiler>\lib*_a.*
 ;
-;                               where
-;                                       <Custom Library Directory>      directory path for custom library software
-;                                       <cpu>                           directory name for specific processor (CPU)
-;                                       <compiler>                      directory name for specific compiler
+;                          where
+;                                  <Custom Library Directory>      directory path for custom library software
+;                                  <cpu>                           directory name for specific processor (CPU)
+;                                  <compiler>                      directory name for specific compiler
 ;
-;                     (b) Product-specific library functions are implemented in individual products.
+;                (b) Product-specific library functions are implemented in individual products.
 ;
-;                 (2) Assumes ARM CPU mode configured for Little Endian.
+;            (2) Assumes ARM CPU mode configured for Little Endian.
 ;********************************************************************************************************
 
 
@@ -69,7 +62,6 @@
         PRESERVE8
 
 
-;$PAGE
 ;********************************************************************************************************
 ;                                             Mem_Copy()
 ;
@@ -125,7 +117,6 @@ Mem_Copy_3
         STMFD       SP!, {R3-R12}           ; save registers on stack
 
 
-;$PAGE
 Chk_Align_32                                ; check if both dest & src 32-bit aligned
         AND         R3, R0, #0x03
         AND         R4, R1, #0x03
@@ -208,7 +199,6 @@ Copy_32_3
         SUB         R2, R2, #(04*01*01)
         B           Copy_32_3
 
-;$PAGE
 Copy_16_1
         CMP         R2, #(02*01*16)         ; Copy chunks of 16 16-bit words (32 bytes per loop)
         BCC         Copy_16_2
@@ -255,7 +245,6 @@ Copy_16_2
         SUB         R2, R2, #(02*01*01)
         B           Copy_16_2
 
-;$PAGE
 Copy_08_1
         CMP         R2, #(01*01*16)         ; Copy chunks of 16 8-bit words (16 bytes per loop)
         BCC         Copy_08_2

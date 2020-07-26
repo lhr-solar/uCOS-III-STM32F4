@@ -1,23 +1,16 @@
 /*
 *********************************************************************************************************
-*                                                uC/CPU
+*                                               uC/CPU
 *                                    CPU CONFIGURATION & PORT LAYER
 *
-*                          (c) Copyright 2004-2015; Micrium, Inc.; Weston, FL
+*                    Copyright 2004-2020 Silicon Laboratories Inc. www.silabs.com
 *
-*               All rights reserved.  Protected by international copyright laws.
+*                                 SPDX-License-Identifier: APACHE-2.0
 *
-*               uC/CPU is provided in source form to registered licensees ONLY.  It is 
-*               illegal to distribute this source code to any third party unless you receive 
-*               written permission by an authorized Micrium representative.  Knowledge of 
-*               the source code may NOT be used to develop a similar product.
+*               This software is subject to an open source license and is distributed by
+*                Silicon Laboratories Inc. pursuant to the terms of the Apache License,
+*                    Version 2.0 available at www.apache.org/licenses/LICENSE-2.0.
 *
-*               Please help us continue to provide the Embedded community with the finest 
-*               software available.  Your honesty is greatly appreciated.
-*
-*               You can find our product's user manual, API reference, release notes and
-*               more information at https://doc.micrium.com.
-*               You can contact us at www.micrium.com.
 *********************************************************************************************************
 */
 
@@ -26,16 +19,12 @@
 *
 *                                            CPU PORT FILE
 *
-*                                            ARM-Cortex-M4
-*                                      RealView Development Suite
-*                            RealView Microcontroller Development Kit (MDK)
-*                                       ARM Developer Suite (ADS)
-*                                            Keil uVision
+*                                               ARMv7-M
 *
-* Filename      : cpu_c.c
-* Version       : V1.30.02.00
-* Programmer(s) : JJL
-*                 BAN
+* Filename : cpu_c.c
+* Version  : v1.32.00
+*********************************************************************************************************
+* Note(s)  : This port supports the ARM Cortex-M3, Cortex-M4 and Cortex-M7 architectures.
 *********************************************************************************************************
 */
 
@@ -46,7 +35,7 @@
 *********************************************************************************************************
 */
 
-#define   MICRIUM_SOURCE
+#define    MICRIUM_SOURCE
 #include  <cpu.h>
 #include  <cpu_core.h>
 
@@ -63,7 +52,7 @@ extern  "C" {
 *********************************************************************************************************
 */
 
-#define  CPU_INT_SRC_POS_MAX                  ((((CPU_REG_NVIC_NVIC + 1) & 0x1F) * 32) + 16)
+#define  CPU_INT_SRC_POS_MAX                  ((((CPU_REG_ICTR & 0xF) + 1) * 32) + 16)
 
 #define  CPU_BIT_BAND_SRAM_REG_LO                 0x20000000
 #define  CPU_BIT_BAND_SRAM_REG_HI                 0x200FFFFF
@@ -129,8 +118,6 @@ extern  "C" {
 *
 * Return(s)   : none.
 *
-* Caller(s)   : Application.
-*
 * Note(s)     : none.
 *********************************************************************************************************
 */
@@ -171,8 +158,6 @@ void  CPU_BitBandClr (CPU_ADDR    addr,
 *
 * Return(s)   : none.
 *
-* Caller(s)   : Application.
-*
 * Note(s)     : none.
 *********************************************************************************************************
 */
@@ -211,22 +196,20 @@ void  CPU_BitBandSet (CPU_ADDR    addr,
 *
 *                           0       Invalid (see Note #1a).
 *                           1       Invalid (see Note #1b).
-*                           2       Non-maskable interrupt.
+*                           2       Non-maskable Interrupt.
 *                           3       Hard Fault.
 *                           4       Memory Management.
 *                           5       Bus Fault.
 *                           6       Usage Fault.
 *                           7-10    Reserved.
-*                           11      SVCall
-*                           12      Debug monitor.
-*                           13      Reserved
+*                           11      SVCall.
+*                           12      Debug Monitor.
+*                           13      Reserved.
 *                           14      PendSV.
 *                           15      SysTick.
 *                           16+     External Interrupt.
 *
 * Return(s)   : none.
-*
-* Caller(s)   : Application.
 *
 * Note(s)     : (1) Several table positions do not contain interrupt sources :
 *
@@ -242,18 +225,18 @@ void  CPU_BitBandSet (CPU_ADDR    addr,
 *                   (e) Debug monitor.
 *                   (f) PendSV.
 *
-*               (3) The maximum Cortex-M3 table position is 256.  A particular Cortex-M3 may have fewer
-*                   than 240 external exceptions and, consequently, fewer than 256 table positions.
-*                   This function assumes that the specified table position is valid if the interrupt
-*                   controller type register's INTLINESNUM field is large enough so that the position
-*                   COULD be valid.
+*               (3) The maximum Cortex-M3, Cortex-M4, and Cortex-M7 table position is 256.  A particular
+*                   Cortex-M may have fewer than 240 external exceptions and, consequently, fewer than
+*                   256 table positions. This function assumes that the specified table position is valid
+*                   if the interrupt controller type register's INTLINESNUM field is large enough so that
+*                   the position COULD be valid.
 *********************************************************************************************************
 */
 
 void  CPU_IntSrcDis (CPU_INT08U  pos)
 {
     CPU_INT08U  group;
-    CPU_INT08U  pos_max;
+    CPU_INT16U  pos_max;
     CPU_INT08U  nbr;
     CPU_SR_ALLOC();
 
@@ -279,38 +262,38 @@ void  CPU_IntSrcDis (CPU_INT08U  pos)
 
         case CPU_INT_MEM:                                       /* Memory management.                                   */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_SHCSR &= ~CPU_REG_NVIC_SHCSR_MEMFAULTENA;
+             CPU_REG_SCB_SHCSR &= ~CPU_REG_SCB_SHCSR_MEMFAULTENA;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_BUSFAULT:                                  /* Bus fault.                                           */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_SHCSR &= ~CPU_REG_NVIC_SHCSR_BUSFAULTENA;
+             CPU_REG_SCB_SHCSR &= ~CPU_REG_SCB_SHCSR_BUSFAULTENA;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_USAGEFAULT:                                /* Usage fault.                                         */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_SHCSR &= ~CPU_REG_NVIC_SHCSR_USGFAULTENA;
+             CPU_REG_SCB_SHCSR &= ~CPU_REG_SCB_SHCSR_USGFAULTENA;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_SYSTICK:                                   /* SysTick.                                             */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_ST_CTRL &= ~CPU_REG_NVIC_ST_CTRL_ENABLE;
+             CPU_REG_SYST_CSR  &= ~CPU_REG_SYST_CSR_ENABLE;
              CPU_CRITICAL_EXIT();
              break;
 
 
                                                                 /* ---------------- EXTERNAL INTERRUPT ---------------- */
         default:
-            pos_max = CPU_INT_SRC_POS_MAX;
-            if (pos < pos_max) {                                /* See Note #3.                                         */
+             pos_max = CPU_INT_SRC_POS_MAX;
+             if (pos < pos_max) {                               /* See Note #3.                                         */
                  group = (pos - 16) / 32;
                  nbr   = (pos - 16) % 32;
 
                  CPU_CRITICAL_ENTER();
-                 CPU_REG_NVIC_CLREN(group) = DEF_BIT(nbr);
+                 CPU_REG_NVIC_ICER(group) = DEF_BIT(nbr);       /* Disable interrupt.                                   */
                  CPU_CRITICAL_EXIT();
              }
              break;
@@ -328,8 +311,6 @@ void  CPU_IntSrcDis (CPU_INT08U  pos)
 *
 * Return(s)   : none.
 *
-* Caller(s)   : Application.
-*
 * Note(s)     : (1) See 'CPU_IntSrcDis()  Note #1'.
 *
 *               (2) See 'CPU_IntSrcDis()  Note #2'.
@@ -342,7 +323,7 @@ void  CPU_IntSrcEn (CPU_INT08U  pos)
 {
     CPU_INT08U  group;
     CPU_INT08U  nbr;
-    CPU_INT08U  pos_max;
+    CPU_INT16U  pos_max;
     CPU_SR_ALLOC();
 
 
@@ -367,38 +348,38 @@ void  CPU_IntSrcEn (CPU_INT08U  pos)
 
         case CPU_INT_MEM:                                       /* Memory management.                                   */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_SHCSR |= CPU_REG_NVIC_SHCSR_MEMFAULTENA;
+             CPU_REG_SCB_SHCSR |= CPU_REG_SCB_SHCSR_MEMFAULTENA;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_BUSFAULT:                                  /* Bus fault.                                           */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_SHCSR |= CPU_REG_NVIC_SHCSR_BUSFAULTENA;
+             CPU_REG_SCB_SHCSR |= CPU_REG_SCB_SHCSR_BUSFAULTENA;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_USAGEFAULT:                                /* Usage fault.                                         */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_SHCSR |= CPU_REG_NVIC_SHCSR_USGFAULTENA;
+             CPU_REG_SCB_SHCSR |= CPU_REG_SCB_SHCSR_USGFAULTENA;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_SYSTICK:                                   /* SysTick.                                             */
              CPU_CRITICAL_ENTER();
-             CPU_REG_NVIC_ST_CTRL |= CPU_REG_NVIC_ST_CTRL_ENABLE;
+             CPU_REG_SYST_CSR  |= CPU_REG_SYST_CSR_ENABLE;
              CPU_CRITICAL_EXIT();
              break;
 
 
                                                                 /* ---------------- EXTERNAL INTERRUPT ---------------- */
         default:
-            pos_max = CPU_INT_SRC_POS_MAX;
-            if (pos < pos_max) {                                /* See Note #3.                                         */
+             pos_max = CPU_INT_SRC_POS_MAX;
+             if (pos < pos_max) {                               /* See Note #3.                                         */
                  group = (pos - 16) / 32;
                  nbr   = (pos - 16) % 32;
 
                  CPU_CRITICAL_ENTER();
-                 CPU_REG_NVIC_SETEN(group) = DEF_BIT(nbr);
+                 CPU_REG_NVIC_ISER(group) = DEF_BIT(nbr);       /* Enable interrupt.                                    */
                  CPU_CRITICAL_EXIT();
              }
              break;
@@ -416,8 +397,6 @@ void  CPU_IntSrcEn (CPU_INT08U  pos)
 *
 * Return(s)   : none.
 *
-* Caller(s)   : Application.
-*
 * Note(s)     : (1) See 'CPU_IntSrcDis()  Note #1'.
 *
 *               (2) The pending status of several interrupts cannot be clear/set :
@@ -431,7 +410,7 @@ void  CPU_IntSrcEn (CPU_INT08U  pos)
 *                   (g) SVCall.
 *                   (h) Debug monitor.
 *                   (i) PendSV.
-*                   (j) Systick 
+*                   (j) Systick
 *
 *               (3) See 'CPU_IntSrcDis()  Note #3'.
 *********************************************************************************************************
@@ -442,7 +421,7 @@ void  CPU_IntSrcPendClr (CPU_INT08U  pos)
 {
     CPU_INT08U  group;
     CPU_INT08U  nbr;
-    CPU_INT08U  pos_max;
+    CPU_INT16U  pos_max;
     CPU_SR_ALLOC();
 
 
@@ -468,13 +447,13 @@ void  CPU_IntSrcPendClr (CPU_INT08U  pos)
              break;
                                                                 /* ---------------- EXTERNAL INTERRUPT ---------------- */
         default:
-            pos_max = CPU_INT_SRC_POS_MAX;
-            if (pos < pos_max) {                                /* See Note #3.                                         */
+             pos_max = CPU_INT_SRC_POS_MAX;
+             if (pos < pos_max) {                               /* See Note #3.                                         */
                  group = (pos - 16) / 32;
                  nbr   = (pos - 16) % 32;
 
                  CPU_CRITICAL_ENTER();
-                 CPU_REG_NVIC_CLRPEND(group) = DEF_BIT(nbr);
+                 CPU_REG_NVIC_ICPR(group) = DEF_BIT(nbr);       /* Clear Pending interrupt.                             */
                  CPU_CRITICAL_EXIT();
              }
              break;
@@ -492,9 +471,11 @@ void  CPU_IntSrcPendClr (CPU_INT08U  pos)
 *
 *               prio    Priority.  Use a lower priority number for a higher priority.
 *
-* Return(s)   : none.
+*               type    Kernel/Non-Kernel aware priority type.
+*                           CPU_INT_KA    Kernel Aware     interrupt request. See Note #4
+*                           CPU_INT_NKA   Non-Kernel Aware interrupt request. See Note #5
 *
-* Caller(s)   : Application.
+* Return(s)   : none.
 *
 * Note(s)     : (1) See 'CPU_IntSrcDis()  Note #1'.
 *
@@ -505,19 +486,45 @@ void  CPU_IntSrcPendClr (CPU_INT08U  pos)
 *                   (c) Hard fault (always -1).
 *
 *               (3) See 'CPU_IntSrcDis()  Note #3'.
+*
+*               (4) A Kernel Aware ISR can make OS service calls in its handler (Mutex, Flags, etc.).
+*                   It follows the template below:
+*
+*                       static  void  KA_ISR_Handler (void)
+*                       {
+*                           CPU_SR_ALLOC();
+*
+*                           CPU_CRITICAL_ENTER();
+*                           OSIntEnter();                            Tell OS we are starting an ISR
+*                           CPU_CRITICAL_EXIT();
+*
+*                           --------------- HANDLER YOUR ISR HERE ---------------
+*
+*                           OSIntExit();                             Tell OS we are leaving the ISR
+*                       }
+*
+*               (5) A Non-Kernel Aware ISR must never make OS service calls. It follows the template below:
+*
+*                       static  void  NKA_ISR_Handler (void)
+*                       {
+*                           --------------- HANDLER YOUR ISR HERE ---------------
+*                       }
 *********************************************************************************************************
 */
 
 void  CPU_IntSrcPrioSet (CPU_INT08U  pos,
-                         CPU_INT08U  prio)
+                         CPU_INT08U  prio,
+                         CPU_INT08U  type)
 {
     CPU_INT08U  group;
     CPU_INT08U  nbr;
-    CPU_INT08U  pos_max;
+    CPU_INT16U  pos_max;
     CPU_INT32U  temp;
+    CPU_INT32U  prio_offset;
     CPU_SR_ALLOC();
 
 
+    prio_offset = (prio << (DEF_OCTET_NBR_BITS - CPU_CFG_NVIC_PRIO_BITS));
     switch (pos) {
         case CPU_INT_STK_PTR:                                   /* ---------------- INVALID OR RESERVED --------------- */
         case CPU_INT_RSVD_07:
@@ -536,80 +543,92 @@ void  CPU_IntSrcPrioSet (CPU_INT08U  pos,
 
         case CPU_INT_MEM:                                       /* Memory management.                                   */
              CPU_CRITICAL_ENTER();
-             temp                 = CPU_REG_NVIC_SHPRI1;
-             temp                &= ~(DEF_OCTET_MASK << (0 * DEF_OCTET_NBR_BITS));
-             temp                |=  (prio           << (0 * DEF_OCTET_NBR_BITS));
-             CPU_REG_NVIC_SHPRI1  = temp;
+             temp                 = CPU_REG_SCB_SHPRI1;
+             temp                &= ~((CPU_INT32U)DEF_OCTET_MASK << (0 * DEF_OCTET_NBR_BITS));
+             temp                |=  ((CPU_INT32U)prio_offset    << (0 * DEF_OCTET_NBR_BITS));
+             CPU_REG_SCB_SHPRI1   = temp;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_BUSFAULT:                                  /* Bus fault.                                           */
              CPU_CRITICAL_ENTER();
-             temp                 = CPU_REG_NVIC_SHPRI1;
-             temp                &= ~(DEF_OCTET_MASK << (1 * DEF_OCTET_NBR_BITS));
-             temp                |=  (prio           << (1 * DEF_OCTET_NBR_BITS));
-             CPU_REG_NVIC_SHPRI1  = temp;
+             temp                 = CPU_REG_SCB_SHPRI1;
+             temp                &= ~((CPU_INT32U)DEF_OCTET_MASK << (1 * DEF_OCTET_NBR_BITS));
+             temp                |=  ((CPU_INT32U)prio_offset    << (1 * DEF_OCTET_NBR_BITS));
+             CPU_REG_SCB_SHPRI1   = temp;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_USAGEFAULT:                                /* Usage fault.                                         */
              CPU_CRITICAL_ENTER();
-             temp                 = CPU_REG_NVIC_SHPRI1;
-             temp                &= ~(DEF_OCTET_MASK << (2 * DEF_OCTET_NBR_BITS));
-             temp                |=  (prio           << (2 * DEF_OCTET_NBR_BITS));
-             CPU_REG_NVIC_SHPRI1  = temp;
+             temp                 = CPU_REG_SCB_SHPRI1;
+             temp                &= ~((CPU_INT32U)DEF_OCTET_MASK << (2 * DEF_OCTET_NBR_BITS));
+             temp                |=  ((CPU_INT32U)prio_offset    << (2 * DEF_OCTET_NBR_BITS));
+             CPU_REG_SCB_SHPRI1   = temp;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_SVCALL:                                    /* SVCall.                                              */
              CPU_CRITICAL_ENTER();
-             temp                 = CPU_REG_NVIC_SHPRI2;
+             temp                 = CPU_REG_SCB_SHPRI2;
              temp                &= ~((CPU_INT32U)DEF_OCTET_MASK << (3 * DEF_OCTET_NBR_BITS));
-             temp                |=  (prio                       << (3 * DEF_OCTET_NBR_BITS));
-             CPU_REG_NVIC_SHPRI2  = temp;
+             temp                |=  ((CPU_INT32U)prio_offset    << (3 * DEF_OCTET_NBR_BITS));
+             CPU_REG_SCB_SHPRI2   = temp;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_DBGMON:                                    /* Debug monitor.                                       */
              CPU_CRITICAL_ENTER();
-             temp                = CPU_REG_NVIC_SHPRI3;
-             temp                &= ~(DEF_OCTET_MASK << (0 * DEF_OCTET_NBR_BITS));
-             temp                |=  (prio           << (0 * DEF_OCTET_NBR_BITS));
-             CPU_REG_NVIC_SHPRI3  = temp;
+             temp                 = CPU_REG_SCB_SHPRI3;
+             temp                &= ~((CPU_INT32U)DEF_OCTET_MASK << (0 * DEF_OCTET_NBR_BITS));
+             temp                |=  ((CPU_INT32U)prio_offset    << (0 * DEF_OCTET_NBR_BITS));
+             CPU_REG_SCB_SHPRI3   = temp;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_PENDSV:                                    /* PendSV.                                              */
              CPU_CRITICAL_ENTER();
-             temp                 = CPU_REG_NVIC_SHPRI3;
-             temp                &= ~(DEF_OCTET_MASK << (2 * DEF_OCTET_NBR_BITS));
-             temp                |=  (prio           << (2 * DEF_OCTET_NBR_BITS));
-             CPU_REG_NVIC_SHPRI3  = temp;
+             temp                 = CPU_REG_SCB_SHPRI3;
+             temp                &= ~((CPU_INT32U)DEF_OCTET_MASK << (2 * DEF_OCTET_NBR_BITS));
+             temp                |=  ((CPU_INT32U)prio_offset    << (2 * DEF_OCTET_NBR_BITS));
+             CPU_REG_SCB_SHPRI3   = temp;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_SYSTICK:                                   /* SysTick.                                             */
              CPU_CRITICAL_ENTER();
-             temp                 = CPU_REG_NVIC_SHPRI3;
+             temp                 = CPU_REG_SCB_SHPRI3;
              temp                &= ~((CPU_INT32U)DEF_OCTET_MASK << (3 * DEF_OCTET_NBR_BITS));
-             temp                |=  (prio                       << (3 * DEF_OCTET_NBR_BITS));
-             CPU_REG_NVIC_SHPRI3  = temp;
+             temp                |=  ((CPU_INT32U)prio_offset    << (3 * DEF_OCTET_NBR_BITS));
+             CPU_REG_SCB_SHPRI3   = temp;
              CPU_CRITICAL_EXIT();
              break;
 
 
                                                                 /* ---------------- EXTERNAL INTERRUPT ---------------- */
         default:
-            pos_max = CPU_INT_SRC_POS_MAX;
-            if (pos < pos_max) {                                /* See Note #3.                                         */
+             pos_max = CPU_INT_SRC_POS_MAX;
+             if (pos < pos_max) {                               /* See Note #3.                                         */
+
+                 if (type == CPU_INT_NKA) {                     /* Check if NKA priority goes beyond KA boundary        */
+                     if (prio >= CPU_CFG_KA_IPL_BOUNDARY) {     /* Priority must be < CPU_CFG_KA_IPL_BOUNDARY           */
+                         CPU_SW_Exception();
+                     }
+
+                 } else {                                       /* Check if KA priority is less than KA boundary        */
+                     if (prio < CPU_CFG_KA_IPL_BOUNDARY) {      /* Priority must be >= CPU_CFG_KA_IPL_BOUNDARY          */
+                         CPU_SW_Exception();
+                     }
+                 }
+
                  group                    = (pos - 16) / 4;
                  nbr                      = (pos - 16) % 4;
 
                  CPU_CRITICAL_ENTER();
-                 temp                     = CPU_REG_NVIC_PRIO(group);
-                 temp                    &= ~(DEF_OCTET_MASK << (nbr * DEF_OCTET_NBR_BITS));
-                 temp                    |=  (prio           << (nbr * DEF_OCTET_NBR_BITS));
-                 CPU_REG_NVIC_PRIO(group) = temp;
+                 temp                     = CPU_REG_NVIC_IPR(group);
+                 temp                    &= ~((CPU_INT32U)DEF_OCTET_MASK << (nbr * DEF_OCTET_NBR_BITS));
+                 temp                    |=  ((CPU_INT32U)prio_offset    << (nbr * DEF_OCTET_NBR_BITS));
+                 CPU_REG_NVIC_IPR(group)  = temp;               /* Set interrupt priority.                              */
                  CPU_CRITICAL_EXIT();
              }
              break;
@@ -628,8 +647,6 @@ void  CPU_IntSrcPrioSet (CPU_INT08U  pos,
 * Return(s)   : Priority of interrupt source.  If the interrupt source specified is invalid, then
 *               DEF_INT_16S_MIN_VAL is returned.
 *
-* Caller(s)   : Application.
-*
 * Note(s)     : (1) See 'CPU_IntSrcDis()      Note #1'.
 *
 *               (2) See 'CPU_IntSrcPrioSet()  Note #2'.
@@ -642,7 +659,7 @@ CPU_INT16S  CPU_IntSrcPrioGet (CPU_INT08U  pos)
 {
     CPU_INT08U  group;
     CPU_INT08U  nbr;
-    CPU_INT08U  pos_max;
+    CPU_INT16U  pos_max;
     CPU_INT16S  prio;
     CPU_INT32U  temp;
     CPU_SR_ALLOC();
@@ -675,7 +692,7 @@ CPU_INT16S  CPU_IntSrcPrioGet (CPU_INT08U  pos)
 
         case CPU_INT_MEM:                                       /* Memory management.                                   */
              CPU_CRITICAL_ENTER();
-             temp = CPU_REG_NVIC_SHPRI1;
+             temp = CPU_REG_SCB_SHPRI1;
              prio = (temp >> (0 * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
              CPU_CRITICAL_EXIT();
              break;
@@ -683,7 +700,7 @@ CPU_INT16S  CPU_IntSrcPrioGet (CPU_INT08U  pos)
 
         case CPU_INT_BUSFAULT:                                  /* Bus fault.                                           */
              CPU_CRITICAL_ENTER();
-             temp = CPU_REG_NVIC_SHPRI1;
+             temp = CPU_REG_SCB_SHPRI1;
              prio = (temp >> (1 * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
              CPU_CRITICAL_EXIT();
              break;
@@ -691,35 +708,35 @@ CPU_INT16S  CPU_IntSrcPrioGet (CPU_INT08U  pos)
 
         case CPU_INT_USAGEFAULT:                                /* Usage fault.                                         */
              CPU_CRITICAL_ENTER();
-             temp = CPU_REG_NVIC_SHPRI1;
+             temp = CPU_REG_SCB_SHPRI1;
              prio = (temp >> (2 * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_SVCALL:                                    /* SVCall.                                              */
              CPU_CRITICAL_ENTER();
-             temp = CPU_REG_NVIC_SHPRI2;
+             temp = CPU_REG_SCB_SHPRI2;
              prio = (temp >> (3 * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_DBGMON:                                    /* Debug monitor.                                       */
              CPU_CRITICAL_ENTER();
-             temp = CPU_REG_NVIC_SHPRI3;
+             temp = CPU_REG_SCB_SHPRI3;
              prio = (temp >> (0 * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_PENDSV:                                    /* PendSV.                                              */
              CPU_CRITICAL_ENTER();
-             temp = CPU_REG_NVIC_SHPRI3;
+             temp = CPU_REG_SCB_SHPRI3;
              prio = (temp >> (2 * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
              CPU_CRITICAL_EXIT();
              break;
 
         case CPU_INT_SYSTICK:                                   /* SysTick.                                             */
              CPU_CRITICAL_ENTER();
-             temp = CPU_REG_NVIC_SHPRI3;
+             temp = CPU_REG_SCB_SHPRI3;
              prio = (temp >> (3 * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
              CPU_CRITICAL_EXIT();
              break;
@@ -727,13 +744,13 @@ CPU_INT16S  CPU_IntSrcPrioGet (CPU_INT08U  pos)
 
                                                                 /* ---------------- EXTERNAL INTERRUPT ---------------- */
         default:
-            pos_max = CPU_INT_SRC_POS_MAX;
-            if (pos < pos_max) {                                /* See Note #3.                                         */
+             pos_max = CPU_INT_SRC_POS_MAX;
+             if (pos < pos_max) {                               /* See Note #3.                                         */
                  group = (pos - 16) / 4;
                  nbr   = (pos - 16) % 4;
 
                  CPU_CRITICAL_ENTER();
-                 temp  = CPU_REG_NVIC_PRIO(group);
+                 temp  = CPU_REG_NVIC_IPR(group);               /* Read group interrupt priority.                       */
                  CPU_CRITICAL_EXIT();
 
                  prio  = (temp >> (nbr * DEF_OCTET_NBR_BITS)) & DEF_OCTET_MASK;
@@ -741,6 +758,10 @@ CPU_INT16S  CPU_IntSrcPrioGet (CPU_INT08U  pos)
                  prio  = DEF_INT_16S_MIN_VAL;
              }
              break;
+    }
+
+    if (prio != DEF_INT_16S_MIN_VAL) {
+        prio = (prio >> (DEF_OCTET_NBR_BITS - CPU_CFG_NVIC_PRIO_BITS));
     }
 
     return (prio);

@@ -9,11 +9,6 @@
 *               part, or may be used as a reference only. This file can be modified as
 *               required to meet the end-product requirements.
 *
-*               Please help us continue to provide the Embedded community with the finest
-*               software available.  Your honesty is greatly appreciated.
-*
-*               You can find information about uC/LIB by visiting doc.micrium.com.
-*               You can contact us at: http://www.micrium.com
 *********************************************************************************************************
 */
 
@@ -24,13 +19,10 @@
 *
 *                                              TEMPLATE
 *
-* Filename      : lib_cfg.h
-* Version       : V1.38.01.00
-* Programmer(s) : FBJ
-*                 JFD
+* Filename : lib_cfg.h
+* Version  : V1.39.00
 *********************************************************************************************************
 */
-
 
 /*
 *********************************************************************************************************
@@ -83,7 +75,7 @@
                                                                 /* Assembly-optimized function(s).                      */
                                                                 /* Enable/disable assembly-optimized memory ...         */
                                                                 /* ... function(s). [see Note #1]                       */
-#define  LIB_MEM_CFG_OPTIMIZE_ASM_EN        DEF_ENABLED
+#define  LIB_MEM_CFG_OPTIMIZE_ASM_EN    DEF_ENABLED
 
 
 /*
@@ -115,7 +107,7 @@
                                                                 /* Heap memory size (in bytes).                         */
                                                                 /* Configure the desired size of the heap memory. ...   */
                                                                 /* ... Set to 0 to disable heap allocation features.    */
-#define  LIB_MEM_CFG_HEAP_SIZE             (1u * 1024u)
+#define  LIB_MEM_CFG_HEAP_SIZE                  1024u
 
 
                                                                 /* Heap memory padding alignment (in bytes).            */
