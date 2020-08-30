@@ -3456,11 +3456,11 @@ static  CPU_CHAR  *Str_FmtNbr_Int32 (CPU_INT32U    nbr,
 {
     CPU_CHAR     *pstr_fmt;
     CPU_DATA      i;
-    CPU_INT32U    nbr_fmt;
+    CPU_INT32U    nbr_fmt = nbr;
     CPU_INT32U    nbr_log;
     CPU_INT08U    nbr_dig_max;
     CPU_INT08U    nbr_dig_min;
-    CPU_INT08U    nbr_dig_fmtd;
+    CPU_INT08U    nbr_dig_fmtd = nbr_dig;
     CPU_INT08U    nbr_neg_sign;
     CPU_INT08U    nbr_lead_char;
     CPU_INT08U    dig_val;
