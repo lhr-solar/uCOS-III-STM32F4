@@ -2713,7 +2713,7 @@ static  void  Mem_DynPoolCreateInternal (const  CPU_CHAR      *p_name,
                                                 CPU_SIZE_T     blk_qty_max,
                                                 LIB_ERR       *p_err)
 {
-    CPU_INT08U  *p_blks;
+    CPU_INT08U  *p_blks = NULL;
     CPU_SIZE_T   blk_size_align;
     CPU_SIZE_T   blk_align_worst = DEF_MAX(blk_align, blk_padding_align);
 
