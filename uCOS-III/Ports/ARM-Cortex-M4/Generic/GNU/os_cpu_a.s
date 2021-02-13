@@ -39,6 +39,7 @@
     .global  OSCtxSw
     .global  OSIntCtxSw
     .global  OS_CPU_PendSVHandler
+    .global  PendSV_Handler                                      @ Alias of the above
     
     
 #if (defined(__VFP_FP__) && !defined(__SOFTFP__))
@@ -252,6 +253,7 @@ OSIntCtxSw:
 @********************************************************************************************************
 
 .thumb_func
+PendSV_Handler:
 OS_CPU_PendSVHandler:
     CPSID   I                                                   @ Prevent interruption during context switch
     MRS     R0, PSP                                             @ PSP is process stack pointer
