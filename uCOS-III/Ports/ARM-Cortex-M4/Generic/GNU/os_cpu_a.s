@@ -254,6 +254,7 @@ OSIntCtxSw:
 
 .thumb_func
 PendSV_Handler:
+.thumb_func
 OS_CPU_PendSVHandler:
     CPSID   I                                                   @ Prevent interruption during context switch
     MRS     R0, PSP                                             @ PSP is process stack pointer
