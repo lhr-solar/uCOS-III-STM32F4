@@ -96,7 +96,7 @@
 #define OS_CFG_TASK_REG_TBL_SIZE        1u   /* Number of task specific registers                                     */
 #define OS_CFG_TASK_SEM_PEND_ABORT_EN   1u   /* Include code for OSTaskSemPendAbort()                                 */
 #define OS_CFG_TASK_SUSPEND_EN          1u   /* Include code for OSTaskSuspend() and OSTaskResume()                   */
-
+#define OS_CFG_TASK_IDLE_EN             1u
 
                                              /* -------------------------- TIME MANAGEMENT -------------------------- */
 #define OS_CFG_TIME_DLY_HMSM_EN         1u   /*     Include code for OSTimeDlyHMSM()                                  */
